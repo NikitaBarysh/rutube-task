@@ -10,6 +10,9 @@ import (
 
 type Service struct {
 	AuthorizationService
+	EmployeeServiceInterface
+	SubscriptionServiceInterface
+	AlertServiceInterface
 }
 
 type AuthorizationService interface {
@@ -21,8 +24,25 @@ type AuthorizationService interface {
 	GeneratePasswordHash(pass string) string
 }
 
+type EmployeeServiceInterface interface {
+	SetEmployeeList(ctx context.Context, employees []entity.Employee) error
+	GetEmployee(ctx context.Context) ([]entity.Employee, error)
+}
+
+type SubscriptionServiceInterface interface {
+	Subscribe(ctx context.Context, userID int, name string) error
+	Unsubscribe(ctx context.Context, userID int, name string) error
+}
+
+type AlertServiceInterface interface {
+	Scheduler()
+}
+
 func NewService(cfg *config.Config, rep *repository.Repository) *Service {
 	return &Service{
-		AuthorizationService: NewService(cfg, rep),
+		AuthorizationService:         NewAuthService(cfg, rep),
+		EmployeeServiceInterface:     NewEmployeeService(rep),
+		SubscriptionServiceInterface: NewSubscriptionService(rep),
+		AlertServiceInterface:        NewAlert(cfg, rep),
 	}
 }

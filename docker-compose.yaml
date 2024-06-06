@@ -7,5 +7,3 @@ services:
       POSTGRES_PASSWORD: qwerty
     ports:
       - "5432:5432"
-    networks:
-      - mynetwork

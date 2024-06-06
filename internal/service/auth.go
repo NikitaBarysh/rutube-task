@@ -29,7 +29,7 @@ type AuthService struct {
 	cfg *config.Config
 }
 
-func NewRepository(cfg *config.Config, rep *repository.Repository) *AuthService {
+func NewAuthService(cfg *config.Config, rep *repository.Repository) *AuthService {
 	return &AuthService{
 		rep: rep,
 		cfg: cfg,

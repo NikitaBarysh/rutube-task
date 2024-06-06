@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 
+	_ "github.com/lib/pq"
+
 	"rutube-task/internal/app"
 	"rutube-task/internal/config"
 	"rutube-task/internal/handler"
@@ -39,11 +41,13 @@ func main() {
 
 	rep := repository.NewRepository(db)
 
-	service := service.NewService(cfg, rep)
+	newService := service.NewService(cfg, rep)
 
-	handler := handler.NewHandler(service)
+	go newService.AlertServiceInterface.Scheduler()
 
-	handler.Register(router)
+	newHandler := handler.NewHandler(newService)
+
+	newHandler.Register(router)
 
 	srv := new(app.Server)
 
@@ -51,4 +55,7 @@ func main() {
 		logrus.Fatalf("Run failed: %v", err)
 	}
 
+	if err := srv.Shutdown(ctx); err != nil {
+		logrus.Fatalf("Shutdown failed: %v", err)
+	}
 }

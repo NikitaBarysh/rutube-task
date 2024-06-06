@@ -3,7 +3,6 @@ package handler
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 
 	"rutube-task/internal/entity"
@@ -12,20 +11,12 @@ import (
 func (h *Handler) signUp(rw http.ResponseWriter, r *http.Request) {
 	var input entity.User
 
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(rw, "err to parse body", http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	defer r.Body.Close()
-
-	if err = json.Unmarshal(b, &input); err != nil {
-		http.Error(rw, "err to unmarshal body", http.StatusBadRequest)
-		return
-	}
-
-	err = h.service.AuthorizationService.ValidateLogin(r.Context(), input)
+	err := h.service.AuthorizationService.ValidateLogin(r.Context(), input)
 	if errors.Is(err, entity.ErrNotUniqueLogin) {
 		http.Error(rw, "not unique login or empty login", http.StatusConflict)
 		return
@@ -51,14 +42,8 @@ func (h *Handler) signUp(rw http.ResponseWriter, r *http.Request) {
 func (h *Handler) singIn(rw http.ResponseWriter, r *http.Request) {
 	var input entity.User
 
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(rw, "err to read body", http.StatusBadRequest)
-		return
-	}
-
-	if err = json.Unmarshal(b, &input); err != nil {
-		http.Error(rw, "err to unmarshal body", http.StatusBadRequest)
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 

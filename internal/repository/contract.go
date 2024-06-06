@@ -10,6 +10,8 @@ import (
 
 type Repository struct {
 	AuthorizationRepository
+	EmployeeRepositoryInterface
+	SubscriptionRepositoryInterface
 }
 
 type AuthorizationRepository interface {
@@ -18,8 +20,22 @@ type AuthorizationRepository interface {
 	Validate(ctx context.Context, username string) error
 }
 
+type EmployeeRepositoryInterface interface {
+	SetEmployeeListDB(ctx context.Context, employeeInfo entity.Employee) error
+	GetEmployeeListDB(ctx context.Context) ([]entity.Employee, error)
+	GetEmployeeIDFromDB(ctx context.Context, name string) (int, error)
+	GetEmployeeBirthdayDB() ([]entity.Employee, error)
+}
+
+type SubscriptionRepositoryInterface interface {
+	SubscribeDB(ctx context.Context, userID int, name string) error
+	UnsubscribeDB(ctx context.Context, userID int, name string) error
+}
+
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		AuthorizationRepository: NewAuthRepository(db),
+		AuthorizationRepository:         NewAuthRepository(db),
+		EmployeeRepositoryInterface:     NewEmployeeRepository(db),
+		SubscriptionRepositoryInterface: NewSubscriptionRepository(db),
 	}
 }

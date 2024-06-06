@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -18,4 +19,8 @@ func (s *Server) Run(cfg *config.Config, handler http.Handler) error {
 		Handler: handler,
 	}
 	return s.httpServer.ListenAndServe()
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.httpServer.Shutdown(ctx)
 }

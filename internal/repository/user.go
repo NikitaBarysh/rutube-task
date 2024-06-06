@@ -23,12 +23,12 @@ func NewAuthRepository(db *sqlx.DB) *AuthRepository {
 func (r *AuthRepository) SetUserDB(ctx context.Context, user entity.User) (int, error) {
 	var id int
 
-	tx, err := r.rep.Beginx()
+	tx, err := r.rep.BeginTxx(ctx, nil)
 	if err != nil {
 		return 0, fmt.Errorf("SetUserDB: err to begin transaction: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, `INSERT INTO users (login, password, birthday) VALUES ($1,$2)`,
+	_, err = tx.ExecContext(ctx, `INSERT INTO users (login, password) VALUES ($1,$2)`,
 		user.Login, user.Password)
 	if err != nil {
 		if errRollback := tx.Rollback(); errRollback != nil {

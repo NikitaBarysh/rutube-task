@@ -17,6 +17,8 @@ type Config struct {
 	DBName    string `envconfig:"DB_NAME"`
 	Salt      string `envconfig:"SALT"`
 	SecretKey string `envconfig:"SECRET_KEY"`
+	BotAPI    string `envconfig:"BOT_API"`
+	ChatID    string `envconfig:"CHAT_ID"`
 }
 
 func LoadConfig() (*Config, error) {
